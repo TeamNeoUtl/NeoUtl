@@ -1,5 +1,5 @@
 use egui_wgpu::wgpu;
-use neoutl_media_api::{ColorMeta, VideoSource};
+use neoutl_media_api::{ColorMeta, DECODE_WATCHDOG_TIMEOUT, VideoSource};
 use std::collections::{HashMap, VecDeque};
 use std::sync::atomic::AtomicU64;
 use std::sync::atomic::{AtomicI64, Ordering};
@@ -33,7 +33,6 @@ const PREFETCH_RADIUS: i64 = 8;
 pub(crate) const RING_CAPACITY: usize = neoutl_media_api::VIDEO_TEXTURE_POOL_CAPACITY;
 const _: () = assert!(RING_CAPACITY as i64 > PREFETCH_RADIUS * 2);
 const DECODE_PREFETCH_FAIL_THRESHOLD: i64 = 30;
-const DECODE_WATCHDOG_TIMEOUT_MS: u64 = 5_000;
 
 const SAFE_RING_CAPACITY: usize = {
     let radius_window = (PREFETCH_RADIUS as usize) * 2 + 2;
@@ -46,7 +45,6 @@ const SAFE_RING_CAPACITY: usize = {
 
 const STOP_SENTINEL: i64 = i64::MIN + 1;
 const NONE_SENTINEL: i64 = i64::MIN;
-const DECODE_WATCHDOG_TIMEOUT: Duration = Duration::from_millis(DECODE_WATCHDOG_TIMEOUT_MS);
 
 struct TextureStore {
     map: HashMap<i64, (wgpu::Texture, ColorMeta)>,
@@ -240,11 +238,36 @@ impl DecodeThreadHandle {
     }
 }
 
+const HUNG_REAP_POLL_INTERVAL: Duration = Duration::from_millis(10);
+const HUNG_REAP_DEADLINE: Duration = Duration::from_millis(100);
+
 impl Drop for DecodeThreadHandle {
+    /// hung=false: req_rx側ループはreq_tx破棄で即座にreturnするため無条件joinで安全。
+    /// hung=true: OSスレッドはFFI呼び出し中で協調的に終了しない可能性がある。
+    /// 無条件joinはDrop呼び出し元(tokioワーカー)を無期限にブロックしうるため、
+    /// 有限時間ポーリングで完了を待ち、間に合わなければ回収を諦めJoinHandleを破棄する
+    /// (OSスレッドはdetachされプロセス終了までリークするが、呼び出し元は停止しない)。
     fn drop(&mut self) {
         self.req_tx = None;
-        if let Some(join) = self.join.take() {
+        let Some(join) = self.join.take() else {
+            return;
+        };
+        if !self.hung {
             let _ = join.join();
+            return;
+        }
+        let mut waited = Duration::ZERO;
+        while !join.is_finished() && waited < HUNG_REAP_DEADLINE {
+            thread::sleep(HUNG_REAP_POLL_INTERVAL);
+            waited += HUNG_REAP_POLL_INTERVAL;
+        }
+        if join.is_finished() {
+            let _ = join.join();
+        } else {
+            eprintln!(
+                "[decode-worker] hungスレッド回収断念、リーク許容 thread={:?}",
+                join.thread().id()
+            );
         }
     }
 }

@@ -1,7 +1,7 @@
 use std::ptr;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Condvar, Mutex};
-use std::time::Duration;
+use std::sync::mpsc;
+use std::sync::{Arc, Mutex};
 
 use ffmpeg_sys_next as sys;
 
@@ -22,65 +22,48 @@ impl Drop for PacketSlot {
     }
 }
 
+/// 容量1のリングバッファ。単一生産者(packet_reader_loop)・単一消費者
+/// (decode_task)が前提。`sync_channel(1)`が停止/満杯待ちを提供するため、
+/// 独自のCondvarポーリングは持たない。
 pub(crate) struct PacketQueue {
-    slot: Mutex<Option<PacketSlot>>,
-    not_full: Condvar,
-    not_empty: Condvar,
+    sender: Mutex<mpsc::SyncSender<PacketSlot>>,
+    receiver: Mutex<mpsc::Receiver<PacketSlot>>,
 }
 
 impl PacketQueue {
     pub(crate) fn new() -> Self {
+        let (sender, receiver) = mpsc::sync_channel(1);
         Self {
-            slot: Mutex::new(None),
-            not_full: Condvar::new(),
-            not_empty: Condvar::new(),
+            sender: Mutex::new(sender),
+            receiver: Mutex::new(receiver),
         }
     }
 
     pub(crate) fn push_blocking(&self, item: PacketSlot, stop: &AtomicBool) -> bool {
-        let mut guard = self.slot.lock().expect("packet queue mutex poisoned");
-        loop {
-            if stop.load(Ordering::Acquire) {
-                return false;
-            }
-            if guard.is_none() {
-                break;
-            }
-            let (g, timeout) = self
-                .not_full
-                .wait_timeout(guard, Duration::from_millis(50))
-                .expect("packet queue condvar poisoned");
-            guard = g;
-            let _ = timeout;
+        if stop.load(Ordering::Acquire) {
+            return false;
         }
-        *guard = Some(item);
-        self.not_empty.notify_one();
-        true
+        let sender = self.sender.lock().expect("packet queue sender poisoned");
+        sender.send(item).is_ok()
     }
 
     pub(crate) fn pop_blocking(&self, stop: &AtomicBool) -> Option<PacketSlot> {
-        let mut guard = self.slot.lock().expect("packet queue mutex poisoned");
-        loop {
-            if let Some(item) = guard.take() {
-                self.not_full.notify_one();
-                return Some(item);
-            }
-            if stop.load(Ordering::Acquire) {
-                return None;
-            }
-            let (g, timeout) = self
-                .not_empty
-                .wait_timeout(guard, Duration::from_millis(50))
-                .expect("packet queue condvar poisoned");
-            guard = g;
-            let _ = timeout;
+        if stop.load(Ordering::Acquire) {
+            return None;
         }
+        let receiver = self
+            .receiver
+            .lock()
+            .expect("packet queue receiver poisoned");
+        receiver.recv().ok()
     }
 
     pub(crate) fn flush(&self) {
-        let mut guard = self.slot.lock().expect("packet queue mutex poisoned");
-        *guard = None;
-        self.not_full.notify_one();
+        let receiver = self
+            .receiver
+            .lock()
+            .expect("packet queue receiver poisoned");
+        while receiver.try_recv().is_ok() {}
     }
 }
 

@@ -4,14 +4,18 @@ use std::sync::Arc;
 use std::sync::mpsc;
 use std::time::Duration;
 
-use neoutl_media_api::{ColorMeta, MediaKind, MediaMeta, MediaVTable, VideoSource};
+use neoutl_media_api::{
+    ColorMeta, DECODE_WATCHDOG_TIMEOUT, MediaKind, MediaMeta, MediaVTable, VideoSource,
+};
 
 use crate::decoder::{VideoDecoder, VideoMeta};
 use crate::frame::VideoFrameStore;
 
-const FRAME_WAIT_TIMEOUT: Duration = Duration::from_secs(5);
 const FRAME_RENDER_BUDGET: Duration = Duration::from_millis(10);
-const OPEN_META_TIMEOUT: Duration = Duration::from_secs(5);
+/// 実質無期限待ち。実際の上限は呼び出し元(runtime層)のDECODE_WATCHDOG_TIMEOUTが
+/// 一箇所で強制するため、ここでは`Instant + Duration`のオーバーフローを避けつつ
+/// 十分大きい値を置くのみで判定ロジックは持たない。
+const UNBOUNDED_WAIT: Duration = Duration::from_secs(3600);
 const CLIP_KEY: &str = "ffmpeg_decoder_source";
 
 pub struct FfmpegVideoSource {
@@ -47,7 +51,7 @@ impl FfmpegVideoSource {
             },
         );
         let meta = rx
-            .recv_timeout(OPEN_META_TIMEOUT)
+            .recv_timeout(DECODE_WATCHDOG_TIMEOUT)
             .map_err(|e| format!("動画メタ情報取得タイムアウト: {e}"))?;
         Ok(Self {
             decoder,
@@ -107,12 +111,12 @@ impl VideoSource for FfmpegVideoSource {
         }
 
         self.store
-            .wait_for_frame(CLIP_KEY, frame_index, FRAME_WAIT_TIMEOUT)
+            .wait_for_frame(CLIP_KEY, frame_index, UNBOUNDED_WAIT)
             .map(|frame| {
                 self.last_color_meta.set(frame.0.color_meta);
                 frame.0.texture.clone()
             })
-            .ok_or_else(|| format!("フレーム取得タイムアウト: frame_index={frame_index}"))
+            .ok_or_else(|| format!("フレーム取得失敗: frame_index={frame_index}"))
     }
 
     fn last_color_meta(&self) -> ColorMeta {

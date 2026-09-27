@@ -2,6 +2,10 @@ pub const DEFAULT_DECODE_CACHE_BYTES: i64 = 512 * 1024 * 1024;
 
 pub const VIDEO_TEXTURE_POOL_CAPACITY: usize = 32;
 
+/// フレーム/メタ取得の唯一の待機上限。呼び出し階層のどの層でも
+/// この1定数のみを参照する。値の重複定義は禁止。
+pub const DECODE_WATCHDOG_TIMEOUT: std::time::Duration = std::time::Duration::from_millis(5_000);
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ColorMeta {
     pub color_matrix: u32,

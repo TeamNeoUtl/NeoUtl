@@ -153,6 +153,32 @@ struct DecodeCaches {
     last_decoded_frame: i64,
 }
 
+/// ram_frame→GPU化→store反映→last_good_frame更新を1箇所に統一する。
+/// GPUデバイス未取得時はfalseを返し、呼び出し側がフォールバック分岐を判断する。
+fn dispatch_frame(
+    ctx: &mut OpenContext,
+    store: &Arc<VideoFrameStore>,
+    clip_key: &str,
+    index: i64,
+    ram_frame: &crate::frame::RamFrame,
+    p0xx_resources: &mut Option<P0xxGpuResources>,
+) -> bool {
+    let media_cache = shared_media_cache();
+    let (Some(_), Some(queue), Some(cache)) = (
+        ctx.gpu_device.as_ref(),
+        ctx.gpu_queue.as_ref(),
+        media_cache.as_ref(),
+    ) else {
+        return false;
+    };
+    let Some(frame) = compose_output_frame(ram_frame, queue, cache, p0xx_resources) else {
+        return false;
+    };
+    store.set_frame(clip_key, index, frame.clone());
+    ctx.last_good_frame = Some(frame);
+    true
+}
+
 fn decode_task(
     ctx: &mut OpenContext,
     requested_target: i64,
@@ -172,33 +198,18 @@ fn decode_task(
     }
     let target = requested_target.clamp(0, ctx.index.len() - 1);
     let max_index = (ctx.index.len() as i64 - 1).max(0);
-    let media_cache = shared_media_cache();
 
     if let Some(ram_frame) = gop_cache.get(target, ram_cache)
-        && let (Some(_), Some(queue), Some(cache)) = (
-            ctx.gpu_device.as_ref(),
-            ctx.gpu_queue.as_ref(),
-            media_cache.as_ref(),
-        )
-        && let Some(frame) = compose_output_frame(&ram_frame, queue, cache, p0xx_resources)
+        && dispatch_frame(ctx, store, clip_key, target, &ram_frame, p0xx_resources)
     {
-        store.set_frame(clip_key, target, frame.clone());
-        ctx.last_good_frame = Some(frame);
         eprintln!(
             "[neoutl-video-decoder][診断][decode_task終了][gop_cache即応] requested_target={requested_target} target={target}"
         );
         return;
     }
     if let Some(ram_frame) = ram_cache.get(target)
-        && let (Some(_), Some(queue), Some(cache)) = (
-            ctx.gpu_device.as_ref(),
-            ctx.gpu_queue.as_ref(),
-            media_cache.as_ref(),
-        )
-        && let Some(frame) = compose_output_frame(&ram_frame, queue, cache, p0xx_resources)
+        && dispatch_frame(ctx, store, clip_key, target, &ram_frame, p0xx_resources)
     {
-        store.set_frame(clip_key, target, frame.clone());
-        ctx.last_good_frame = Some(frame);
         eprintln!(
             "[neoutl-video-decoder][診断][decode_task終了][ram_cache即応] requested_target={requested_target} target={target}"
         );
@@ -301,19 +312,16 @@ fn decode_task(
                     new_gop_block.frame_indices.push(decoded_index);
 
                     if decoded_index == target && !target_dispatched {
-                        if let (Some(_), Some(queue), Some(cache)) = (
-                            ctx.gpu_device.as_ref(),
-                            ctx.gpu_queue.as_ref(),
-                            media_cache.as_ref(),
+                        if dispatch_frame(
+                            ctx,
+                            store,
+                            clip_key,
+                            decoded_index,
+                            &ram_frame,
+                            p0xx_resources,
                         ) {
-                            if let Some(frame) =
-                                compose_output_frame(&ram_frame, queue, cache, p0xx_resources)
-                            {
-                                ctx.last_good_frame = Some(frame.clone());
-                                store.set_frame(clip_key, decoded_index, frame);
-                                target_dispatched = true;
-                            }
-                        } else {
+                            target_dispatched = true;
+                        } else if ctx.gpu_device.is_none() || ctx.gpu_queue.is_none() {
                             eprintln!(
                                 "[neoutl-video-decoder][非対応] wgpuデバイス未取得、昇格スキップ"
                             );
@@ -321,17 +329,15 @@ fn decode_task(
                     }
                 }
             } else if decoded_index == target && !target_dispatched {
-                if let Some(ram_frame) = ram_cache.get(decoded_index)
-                    && let (Some(_), Some(queue), Some(cache)) = (
-                        ctx.gpu_device.as_ref(),
-                        ctx.gpu_queue.as_ref(),
-                        media_cache.as_ref(),
-                    )
-                    && let Some(frame) =
-                        compose_output_frame(&ram_frame, queue, cache, p0xx_resources)
-                {
-                    ctx.last_good_frame = Some(frame.clone());
-                    store.set_frame(clip_key, decoded_index, frame);
+                if let Some(ram_frame) = ram_cache.get(decoded_index) {
+                    dispatch_frame(
+                        ctx,
+                        store,
+                        clip_key,
+                        decoded_index,
+                        &ram_frame,
+                        p0xx_resources,
+                    );
                 }
                 target_dispatched = true;
             }
@@ -366,6 +372,7 @@ decoded_frame_count={}",
         if eof
             || (!should_fill_gop && *last_decoded_frame >= target)
             || *last_decoded_frame >= gop_end
+            || ctx.hw_poisoned
         {
             break;
         }

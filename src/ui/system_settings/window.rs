@@ -5,7 +5,7 @@ use crate::app::update::UpdateStatus;
 use crate::audio::{plugin_registry, plugin_settings};
 use crate::ecs::{
     EcsWorld,
-    resources::{AudioPluginSettingsResource, SystemSettingsResource},
+    resources::{AudioPluginSettingsResource, CodecDecodeOverride, SystemSettingsResource},
 };
 use crate::infra::localization::tr;
 use crate::ui::ui_ext::{self, UiExt, page_title, row_between_style};
@@ -42,6 +42,8 @@ pub struct SystemSettingsWindow {
     pub(super) decode_backend: i32,
     pub(super) hw_decode_extra_frames: i32,
     pub(super) hw_device_type_priority: Vec<String>,
+    pub(super) codec_decode_overrides: Vec<CodecDecodeOverride>,
+    pub(super) selected_codec_tab: usize,
     pub(super) default_snap: bool,
     pub(super) magnetic_snap_range: i32,
 
@@ -56,6 +58,20 @@ pub struct SystemSettingsWindow {
     pub(super) save_status: String,
 }
 
+fn apply_codec_decode_overrides(overrides: &[CodecDecodeOverride]) {
+    for o in overrides {
+        neo_media_ffmpeg::set_force_sw_decode(&o.codec_kind, o.force_sw_decode);
+        if o.custom_priority_enabled {
+            neo_media_ffmpeg::set_hw_device_type_priority_for_codec(
+                &o.codec_kind,
+                o.hw_device_type_priority.clone(),
+            );
+        } else {
+            neo_media_ffmpeg::clear_hw_device_type_priority_for_codec(&o.codec_kind);
+        }
+    }
+}
+
 impl SystemSettingsWindow {
     pub fn new(world_holder: &Arc<Mutex<EcsWorld>>) -> Self {
         if let Some(loaded) = load_from_disk() {
@@ -66,8 +82,10 @@ impl SystemSettingsWindow {
         let s = world_holder.lock().unwrap().get_system_settings();
 
         neoutl_media_runtime::runtime::set_worker_threads(s.worker_threads);
+        neo_media_ffmpeg::set_decode_thread_cap(s.worker_threads);
         neo_media_ffmpeg::set_hw_decode_extra_frames(s.hw_decode_extra_frames);
         neo_media_ffmpeg::set_hw_device_type_priority(s.hw_device_type_priority.clone());
+        apply_codec_decode_overrides(&s.codec_decode_overrides);
         crate::app::theme::restore(&s.theme_id);
 
         let update_status = Arc::new(Mutex::new(UpdateStatus::Idle));
@@ -93,6 +111,8 @@ impl SystemSettingsWindow {
             decode_backend: s.decode_backend,
             hw_decode_extra_frames: s.hw_decode_extra_frames,
             hw_device_type_priority: s.hw_device_type_priority.clone(),
+            codec_decode_overrides: s.codec_decode_overrides.clone(),
+            selected_codec_tab: 0,
             default_snap: s.default_snap,
             magnetic_snap_range: s.magnetic_snap_range,
             check_update_on_startup: s.check_update_on_startup,
@@ -114,6 +134,13 @@ impl SystemSettingsWindow {
         let mut s = world.get_system_settings();
         mutate(&mut s);
         world.set_system_settings(s);
+    }
+
+    pub(super) fn persist_codec_overrides(&self, world_holder: &Arc<Mutex<EcsWorld>>) {
+        let overrides = self.codec_decode_overrides.clone();
+        self.persist(world_holder, |s| {
+            s.codec_decode_overrides = overrides.clone()
+        });
     }
 
     pub(super) fn persistable_audio_plugin_settings(&self) -> AudioPluginSettingsResource {
@@ -138,9 +165,12 @@ impl SystemSettingsWindow {
             .unwrap()
             .set_system_settings(loaded.clone());
         neoutl_media_runtime::runtime::set_worker_threads(loaded.worker_threads);
+        neo_media_ffmpeg::set_decode_thread_cap(loaded.worker_threads);
         neo_media_ffmpeg::set_hw_decode_extra_frames(loaded.hw_decode_extra_frames);
         neo_media_ffmpeg::set_hw_device_type_priority(loaded.hw_device_type_priority.clone());
+        apply_codec_decode_overrides(&loaded.codec_decode_overrides);
         self.hw_device_type_priority = loaded.hw_device_type_priority.clone();
+        self.codec_decode_overrides = loaded.codec_decode_overrides.clone();
 
         self.theme_choice = crate::app::theme::from_id(&loaded.theme_id);
         crate::app::theme::set(self.theme_choice);

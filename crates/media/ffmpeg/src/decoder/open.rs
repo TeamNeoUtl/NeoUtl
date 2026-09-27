@@ -10,12 +10,13 @@ use ffmpeg_sys_next as sys;
 use crate::frame::VideoFrame;
 use crate::index::{FrameIndex, build_index};
 
+use super::codec_registry::codec_kind_of;
 use super::hw_device::{
-    HwPixFmtBox, find_decoder_for_codec_id, hw_get_format, poisoned_hw_types_for,
-    try_init_hw_device,
+    HwPixFmtBox, find_decoder_for_codec_id, hw_get_format, is_force_sw_decode,
+    poisoned_hw_types_for, sw_forced_get_format, try_init_hw_device,
 };
 use super::packet_queue::{PacketQueue, SeekLock};
-use super::{hw_decode_extra_frames, shared_wgpu_queue};
+use super::{effective_decode_thread_cap, hw_decode_extra_frames, shared_wgpu_queue};
 
 pub(crate) struct OpenContext {
     pub(crate) fmt_ctx: *mut sys::AVFormatContext,
@@ -140,9 +141,15 @@ pub(crate) fn open_input(
             std::mem::transmute::<i32, sys::AVPixelFormat>((*(*stream).codecpar).format);
 
         let excluded = poisoned_hw_types_for(path);
-        if let Some((created_hw_ctx, hw_pix_fmt, device_type_i32)) =
+        let codec_kind = codec_kind_of((*(*stream).codecpar).codec_id);
+        let force_sw = codec_kind.is_some_and(is_force_sw_decode);
+        let hw_result = if force_sw {
+            None
+        } else {
             try_init_hw_device(codec, stream_sw_format, gpu_device, &excluded)
-        {
+        };
+
+        if let Some((created_hw_ctx, hw_pix_fmt, device_type_i32)) = hw_result {
             hw_device_ctx = created_hw_ctx;
             hw_device_type_i32 = device_type_i32;
             let boxed = Box::new(HwPixFmtBox {
@@ -155,13 +162,15 @@ pub(crate) fn open_input(
             hw_pix_fmt_box = Some(boxed);
         } else {
             let capabilities = (*codec).capabilities;
+            let thread_cap = effective_decode_thread_cap().max(1);
             if (capabilities & sys::AV_CODEC_CAP_FRAME_THREADS as i32) != 0 {
                 (*dec_ctx).thread_type = sys::FF_THREAD_FRAME;
-                (*dec_ctx).thread_count = 0;
+                (*dec_ctx).thread_count = thread_cap;
             } else if (capabilities & sys::AV_CODEC_CAP_SLICE_THREADS as i32) != 0 {
                 (*dec_ctx).thread_type = sys::FF_THREAD_SLICE;
-                (*dec_ctx).thread_count = 0;
+                (*dec_ctx).thread_count = thread_cap;
             }
+            (*dec_ctx).get_format = Some(sw_forced_get_format);
         }
 
         if sys::avcodec_open2(dec_ctx, codec, ptr::null_mut()) != 0 {
@@ -212,6 +221,45 @@ pub(crate) fn open_input(
     }
 }
 
+/// ISOBMFF av1Cのバイトレイアウト: byte0=marker+version, byte1=seq_profile/seq_level_idx_0,
+/// byte2=フラグ群, byte3=予約+initial_presentation_delay, byte4以降=configOBUs
+/// (sequence_header_obuを含む生OBU列)。AV1 Codec Configuration Box (av1C) 仕様上固定。
+const AV1C_CONFIG_OBUS_OFFSET: usize = 4;
+
+/// avcodec_flush_buffers()はFFmpegネイティブAV1デコーダの内部sequence header状態を破棄する。
+/// MKV/MP4のAV1格納形式 (av1C) はsequence header OBUをextradataに一度だけ格納し、
+/// GOPごとに再送しないため、flush後最初のkeyframeパケットだけではデコーダが
+/// sequence headerを再取得できず「No sequence header available」で失敗し続ける。
+/// dec_ctx.extradata中のconfigOBUs (sequence header OBUを含む) のみを合成パケットとして
+/// send_packetすることで、実データを変更せずデコーダ内部状態のみを復元する。
+/// codec_idがAV1以外の場合、およびextradataがAV1C_CONFIG_OBUS_OFFSET以下の場合は何もしない。
+unsafe fn resend_av1_sequence_header_if_needed(dec_ctx: *mut sys::AVCodecContext) {
+    unsafe {
+        if (*dec_ctx).codec_id != sys::AVCodecID::AV_CODEC_ID_AV1 {
+            return;
+        }
+        let extradata = (*dec_ctx).extradata;
+        let extradata_size = (*dec_ctx).extradata_size.max(0) as usize;
+        if extradata.is_null() || extradata_size <= AV1C_CONFIG_OBUS_OFFSET {
+            return;
+        }
+        let obu_ptr = extradata.add(AV1C_CONFIG_OBUS_OFFSET);
+        let obu_len = extradata_size - AV1C_CONFIG_OBUS_OFFSET;
+
+        let pkt = sys::av_packet_alloc();
+        if pkt.is_null() {
+            return;
+        }
+        if sys::av_new_packet(pkt, obu_len as i32) < 0 {
+            sys::av_packet_free(&mut { pkt });
+            return;
+        }
+        ptr::copy_nonoverlapping(obu_ptr, (*pkt).data, obu_len);
+        sys::avcodec_send_packet(dec_ctx, pkt);
+        sys::av_packet_free(&mut { pkt });
+    }
+}
+
 pub(crate) fn seek_to_keyframe(ctx: &mut OpenContext, keyframe_index: i64) {
     let _seek_guard = ctx.seek_lock.0.lock().expect("seek lock poisoned");
     ctx.packet_queue.flush();
@@ -236,5 +284,6 @@ pub(crate) fn seek_to_keyframe(ctx: &mut OpenContext, keyframe_index: i64) {
             );
         }
         sys::avcodec_flush_buffers(ctx.dec_ctx);
+        resend_av1_sequence_header_if_needed(ctx.dec_ctx);
     }
 }

@@ -254,6 +254,37 @@ pub struct SystemSettingsResource {
     pub max_group_chain_depth: i32,
     pub hw_decode_extra_frames: i32,
     pub hw_device_type_priority: Vec<String>,
+    pub codec_decode_overrides: Vec<CodecDecodeOverride>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct CodecDecodeOverride {
+    pub codec_kind: String,
+    pub force_sw_decode: bool,
+    pub custom_priority_enabled: bool,
+    pub hw_device_type_priority: Vec<String>,
+}
+
+fn codec_decode_override_to_schema(
+    value: &CodecDecodeOverride,
+) -> neoutl_schema::CodecDecodeOverride {
+    neoutl_schema::CodecDecodeOverride {
+        codec_kind: value.codec_kind.clone(),
+        force_sw_decode: value.force_sw_decode,
+        custom_priority_enabled: value.custom_priority_enabled,
+        hw_device_type_priority: value.hw_device_type_priority.clone(),
+    }
+}
+
+fn codec_decode_override_from_schema(
+    value: &neoutl_schema::CodecDecodeOverride,
+) -> CodecDecodeOverride {
+    CodecDecodeOverride {
+        codec_kind: value.codec_kind.clone(),
+        force_sw_decode: value.force_sw_decode,
+        custom_priority_enabled: value.custom_priority_enabled,
+        hw_device_type_priority: value.hw_device_type_priority.clone(),
+    }
 }
 
 impl From<&SystemSettingsResource> for neoutl_schema::SystemSettings {
@@ -275,6 +306,11 @@ impl From<&SystemSettingsResource> for neoutl_schema::SystemSettings {
             max_group_chain_depth: value.max_group_chain_depth,
             hw_decode_extra_frames: value.hw_decode_extra_frames,
             hw_device_type_priority: value.hw_device_type_priority.clone(),
+            codec_decode_overrides: value
+                .codec_decode_overrides
+                .iter()
+                .map(codec_decode_override_to_schema)
+                .collect(),
         }
     }
 }
@@ -310,6 +346,11 @@ impl TryFrom<&neoutl_schema::SystemSettings> for SystemSettingsResource {
             } else {
                 value.hw_device_type_priority.clone()
             },
+            codec_decode_overrides: value
+                .codec_decode_overrides
+                .iter()
+                .map(codec_decode_override_from_schema)
+                .collect(),
         })
     }
 }
@@ -414,6 +455,7 @@ impl SystemSettingsResource {
             max_group_chain_depth: config::SYSTEM_DEFAULT_MAX_GROUP_CHAIN_DEPTH,
             hw_decode_extra_frames: config::SYSTEM_DEFAULT_HW_DECODE_EXTRA_FRAMES,
             hw_device_type_priority: default_hw_device_type_priority(),
+            codec_decode_overrides: Vec::new(),
         }
     }
 }

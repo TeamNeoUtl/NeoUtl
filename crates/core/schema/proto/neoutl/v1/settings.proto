@@ -19,6 +19,14 @@ message SystemSettings {
   int32 max_group_chain_depth = 16;
   int32 hw_decode_extra_frames = 17;
   repeated string hw_device_type_priority = 18;
+  repeated CodecDecodeOverride codec_decode_overrides = 19;
+}
+
+message CodecDecodeOverride {
+  string codec_kind = 1;
+  bool force_sw_decode = 2;
+  bool custom_priority_enabled = 3;
+  repeated string hw_device_type_priority = 4;
 }
 
 message AudioPluginCatalogEntry {

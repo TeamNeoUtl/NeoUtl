@@ -33,6 +33,20 @@ pub(super) fn hw_backend_display_name(id: &str) -> String {
     }
 }
 
+pub(super) fn codec_display_name(codec_kind: &str) -> String {
+    match codec_kind {
+        "av1" => "AV1".to_owned(),
+        "hevc" => "HEVC (H.265)".to_owned(),
+        "h264" => "H.264".to_owned(),
+        "vp9" => "VP9".to_owned(),
+        "vp8" => "VP8".to_owned(),
+        "mpeg2" => "MPEG-2".to_owned(),
+        "mpeg4" => "MPEG-4".to_owned(),
+        "vc1" => "VC-1".to_owned(),
+        other => other.to_owned(),
+    }
+}
+
 pub(super) fn settings_path() -> PathBuf {
     std::env::current_exe()
         .ok()

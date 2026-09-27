@@ -9,6 +9,7 @@ use crate::frame::VideoFrameStore;
 use crate::index::FrameIndex;
 
 mod av_errors;
+mod codec_registry;
 mod frame_convert;
 mod hw_device;
 mod open;
@@ -17,7 +18,11 @@ mod pixfmt;
 pub(crate) mod staging_pool;
 mod worker;
 
-pub use hw_device::{default_hw_device_type_priority, set_hw_device_type_priority};
+pub use codec_registry::CODEC_KIND_LIST;
+pub use hw_device::{
+    clear_hw_device_type_priority_for_codec, default_hw_device_type_priority, is_force_sw_decode,
+    set_force_sw_decode, set_hw_device_type_priority, set_hw_device_type_priority_for_codec,
+};
 
 use staging_pool::StagingPool;
 
@@ -33,6 +38,25 @@ pub fn set_hw_decode_extra_frames(count: i32) {
 
 pub(crate) fn hw_decode_extra_frames() -> i32 {
     HW_DECODE_EXTRA_FRAMES.load(std::sync::atomic::Ordering::Acquire)
+}
+
+static DECODE_THREAD_CAP: std::sync::atomic::AtomicI32 = std::sync::atomic::AtomicI32::new(0);
+
+/// 0はsystem設定「自動」を意味し、effective_decode_thread_cap()で
+/// available_parallelism()に解決される。
+pub fn set_decode_thread_cap(count: i32) {
+    DECODE_THREAD_CAP.store(count, std::sync::atomic::Ordering::Release);
+}
+
+pub(crate) fn effective_decode_thread_cap() -> i32 {
+    let cap = DECODE_THREAD_CAP.load(std::sync::atomic::Ordering::Acquire);
+    if cap > 0 {
+        cap
+    } else {
+        std::thread::available_parallelism()
+            .map(|n| n.get() as i32)
+            .unwrap_or(1)
+    }
 }
 
 pub fn shared_wgpu_submit_lock() -> Arc<Mutex<()>> {

@@ -129,14 +129,17 @@ pub(crate) fn run_worker<F: FnOnce(VideoMeta) + Send + 'static>(req: WorkerSpawn
             &last_requested_frame,
         );
 
+        let max_index = (ctx.index.len() as i64 - 1).max(0);
         let latest_requested = last_requested_frame.load(Ordering::Acquire);
-        if latest_requested >= 0 && latest_requested != target {
+        let latest_clamped = latest_requested.clamp(0, max_index);
+        let dispatched_clamped = target.clamp(0, max_index);
+        if latest_requested >= 0 && latest_clamped != dispatched_clamped {
             let mut guard = lock.lock().expect("mailbox mutex poisoned");
             if guard.target_frame.is_none() && !guard.stopped {
                 eprintln!(
-                    "[neoutl-video-decoder][診断][収束再投入] dispatched={target} latest_requested={latest_requested}"
+                    "[neoutl-video-decoder][診断][収束再投入] dispatched={dispatched_clamped} latest_requested={latest_clamped}"
                 );
-                guard.target_frame = Some(latest_requested);
+                guard.target_frame = Some(latest_clamped);
                 cvar.notify_one();
             }
         }
@@ -168,6 +171,7 @@ fn decode_task(
         return;
     }
     let target = requested_target.clamp(0, ctx.index.len() - 1);
+    let max_index = (ctx.index.len() as i64 - 1).max(0);
     let media_cache = shared_media_cache();
 
     if let Some(ram_frame) = gop_cache.get(target, ram_cache)
@@ -332,10 +336,11 @@ fn decode_task(
                 target_dispatched = true;
             }
 
-            if frames_since_dispatch > 0
-                && last_requested_frame.load(Ordering::Acquire) != requested_target
-            {
-                let superseded_by = last_requested_frame.load(Ordering::Acquire);
+            let latest_clamped = last_requested_frame
+                .load(Ordering::Acquire)
+                .clamp(0, max_index);
+            if frames_since_dispatch > 0 && latest_clamped != target {
+                let superseded_by = latest_clamped;
                 eprintln!(
                     "[neoutl-video-decoder][診断][decode_task中断] requested_target={requested_target} \
 target={target} last_decoded_frame={last_decoded_frame} superseded_by={superseded_by} \

@@ -6,6 +6,7 @@ use std::sync::{Arc, Mutex, OnceLock};
 
 use ffmpeg_sys_next as sys;
 
+use super::codec_registry::codec_kind_of;
 use super::pixfmt::{
     av_pix_fmt_bgr0, av_pix_fmt_none, av_pix_fmt_nv12, av_pix_fmt_p010le, av_pix_fmt_p012le,
     av_pix_fmt_p016le, av_pix_fmt_rgb0, av_pix_fmt_yuv420p, av_pix_fmt_yuv420p10le,
@@ -51,6 +52,29 @@ pub(crate) unsafe extern "C" fn hw_get_format(
         let mut p = pixfmts;
         while std::mem::transmute::<sys::AVPixelFormat, i32>(*p) != av_pix_fmt_none() {
             if std::mem::transmute::<sys::AVPixelFormat, i32>(*p) == hw_pix_fmt {
+                return *p;
+            }
+            p = p.add(1);
+        }
+        *pixfmts
+    }
+}
+
+/// get_format未設定（NULL）のままavcodec_open2すると、FFmpeg既定のget_format実装が
+/// pix_fmtsリスト中のhwaccel形式に対し自動でhwaccel初期化を試行してからsoftware側に
+/// フォールバックする。この自動試行そのものがドライバ層のクラッシュを誘発しうるため、
+/// hw_device_ctxを設定しない経路（SW強制／HW初期化失敗いずれも含む）では、hwaccelに
+/// 一切触れずリスト先頭の非hwaccelフォーマットを直接返す本関数をget_formatに設定する。
+/// pixfmtsはAV_PIX_FMT_NONE終端の配列であることをFFmpeg側が保証する。
+pub(crate) unsafe extern "C" fn sw_forced_get_format(
+    _ctx: *mut sys::AVCodecContext,
+    pixfmts: *const sys::AVPixelFormat,
+) -> sys::AVPixelFormat {
+    unsafe {
+        let mut p = pixfmts;
+        while std::mem::transmute::<sys::AVPixelFormat, i32>(*p) != av_pix_fmt_none() {
+            let desc = sys::av_pix_fmt_desc_get(*p);
+            if !desc.is_null() && ((*desc).flags & sys::AV_PIX_FMT_FLAG_HWACCEL as u64) == 0 {
                 return *p;
             }
             p = p.add(1);
@@ -110,7 +134,7 @@ unsafe fn hw_config_priority_rank(
 /// すなわち対応デコーダが存在しない場合のみである。
 pub(crate) unsafe fn find_decoder_for_codec_id(codec_id: sys::AVCodecID) -> *const sys::AVCodec {
     unsafe {
-        let priority = hw_device_type_priority_store().lock().unwrap();
+        let priority = hw_device_type_priority_for(codec_kind_of(codec_id));
         let mut best: Option<(*const sys::AVCodec, usize)> = None;
         let mut iter_state: *mut c_void = ptr::null_mut();
         loop {
@@ -200,7 +224,59 @@ pub fn set_hw_device_type_priority(order: Vec<String>) {
     *hw_device_type_priority_store().lock().unwrap() = valid;
 }
 
-pub(crate) fn available_hw_device_types() -> Vec<sys::AVHWDeviceType> {
+fn force_sw_codecs_store() -> &'static Mutex<HashSet<String>> {
+    static STORE: OnceLock<Mutex<HashSet<String>>> = OnceLock::new();
+    STORE.get_or_init(|| Mutex::new(HashSet::new()))
+}
+
+/// キーの有無がコーデック単位の個別優先順「有効/無効」を表す。
+/// キー不在 = グローバル設定を使用。キー存在 = 個別優先順を使用。
+fn per_codec_hw_priority_store() -> &'static Mutex<HashMap<String, Vec<String>>> {
+    static STORE: OnceLock<Mutex<HashMap<String, Vec<String>>>> = OnceLock::new();
+    STORE.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+pub fn set_force_sw_decode(codec_kind: &str, forced: bool) {
+    let mut store = force_sw_codecs_store().lock().unwrap();
+    if forced {
+        store.insert(codec_kind.to_owned());
+    } else {
+        store.remove(codec_kind);
+    }
+}
+
+pub fn is_force_sw_decode(codec_kind: &str) -> bool {
+    force_sw_codecs_store().lock().unwrap().contains(codec_kind)
+}
+
+pub fn set_hw_device_type_priority_for_codec(codec_kind: &str, order: Vec<String>) {
+    let valid: Vec<String> = order
+        .into_iter()
+        .filter(|name| HW_DEVICE_TYPE_PRIORITY_DEFAULT.contains(&name.as_str()))
+        .collect();
+    per_codec_hw_priority_store()
+        .lock()
+        .unwrap()
+        .insert(codec_kind.to_owned(), valid);
+}
+
+pub fn clear_hw_device_type_priority_for_codec(codec_kind: &str) {
+    per_codec_hw_priority_store()
+        .lock()
+        .unwrap()
+        .remove(codec_kind);
+}
+
+pub(crate) fn hw_device_type_priority_for(codec_kind: Option<&str>) -> Vec<String> {
+    if let Some(kind) = codec_kind
+        && let Some(order) = per_codec_hw_priority_store().lock().unwrap().get(kind)
+    {
+        return order.clone();
+    }
+    hw_device_type_priority_store().lock().unwrap().clone()
+}
+
+pub(crate) fn available_hw_device_types(priority: &[String]) -> Vec<sys::AVHWDeviceType> {
     let mut found: Vec<sys::AVHWDeviceType> = Vec::new();
     unsafe {
         let mut t = sys::av_hwdevice_iterate_types(sys::AVHWDeviceType::AV_HWDEVICE_TYPE_NONE);
@@ -210,7 +286,7 @@ pub(crate) fn available_hw_device_types() -> Vec<sys::AVHWDeviceType> {
         }
     }
     let mut ordered: Vec<sys::AVHWDeviceType> = Vec::new();
-    for name in hw_device_type_priority_store().lock().unwrap().iter() {
+    for name in priority {
         let c_name = CString::new(name.as_str()).expect("設定値のCString変換失敗");
         let device_type = unsafe { sys::av_hwdevice_find_type_by_name(c_name.as_ptr()) };
         if device_type != sys::AVHWDeviceType::AV_HWDEVICE_TYPE_NONE && found.contains(&device_type)
@@ -298,7 +374,8 @@ pub(crate) unsafe fn try_init_hw_device(
 ) -> Option<(*mut sys::AVBufferRef, i32, i32)> {
     let _ = gpu_device;
     unsafe {
-        let device_types = available_hw_device_types();
+        let priority = hw_device_type_priority_for(codec_kind_of((*codec).id));
+        let device_types = available_hw_device_types(&priority);
         eprintln!("[neoutl-video-decoder][diag] 検出HWデバイスタイプ={device_types:?}");
         if !excluded_device_types.is_empty() {
             eprintln!(

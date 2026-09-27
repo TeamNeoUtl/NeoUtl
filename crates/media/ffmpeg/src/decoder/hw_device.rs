@@ -1,5 +1,5 @@
 use std::collections::{HashMap, HashSet};
-use std::ffi::CString;
+use std::ffi::{CStr, CString, c_void};
 use std::path::{Path, PathBuf};
 use std::ptr;
 use std::sync::{Arc, Mutex, OnceLock};
@@ -62,6 +62,77 @@ pub(crate) unsafe extern "C" fn hw_get_format(
 pub(crate) fn poisoned_hw_registry() -> &'static Mutex<HashMap<PathBuf, HashSet<i32>>> {
     static REGISTRY: OnceLock<Mutex<HashMap<PathBuf, HashSet<i32>>>> = OnceLock::new();
     REGISTRY.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+/// codecのhw configを列挙し、hw_device_type_priority_store()に登録された
+/// device_type名のうち最も優先順位の高いものを一致させたrank (小さいほど優先) を返す。
+/// method対象はAV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTXのみ。
+/// このmethodはget_format+hw_device_ctx方式によるhwaccel/software両対応を意味し、
+/// hw専用ラッパー実装 (例: h264_cuvid、method=AV_CODEC_HW_CONFIG_METHOD_INTERNAL) は
+/// このmethodを広告しないため候補から自然に除外される。
+/// 一致するdevice_typeが1つもない場合はNoneを返す。
+unsafe fn hw_config_priority_rank(
+    codec: *const sys::AVCodec,
+    priority: &[String],
+) -> Option<usize> {
+    unsafe {
+        let mut i = 0;
+        let mut best_rank: Option<usize> = None;
+        loop {
+            let config = sys::avcodec_get_hw_config(codec, i);
+            if config.is_null() {
+                break;
+            }
+            i += 1;
+            let methods = (*config).methods;
+            if (methods & sys::AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX as i32) == 0 {
+                continue;
+            }
+            let name_ptr = sys::av_hwdevice_get_type_name((*config).device_type);
+            if name_ptr.is_null() {
+                continue;
+            }
+            let name = CStr::from_ptr(name_ptr).to_string_lossy();
+            let Some(rank) = priority.iter().position(|p| p.as_str() == name) else {
+                continue;
+            };
+            best_rank = Some(best_rank.map_or(rank, |b| b.min(rank)));
+        }
+        best_rank
+    }
+}
+
+/// codec_idに対応する全デコーダ実装 (例: AV1のnative実装とlibdav1d) を走査し、
+/// hw_device_type_priority_store()の優先順位に最も早く一致するhw config
+/// (AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) を持つ実装を選ぶ。
+/// 一致する実装が存在しない場合はavcodec_find_decoder(codec_id)の結果にフォールバックする。
+/// この関数の戻り値がNULLになるのは、avcodec_find_decoderがNULLを返す場合、
+/// すなわち対応デコーダが存在しない場合のみである。
+pub(crate) unsafe fn find_decoder_for_codec_id(codec_id: sys::AVCodecID) -> *const sys::AVCodec {
+    unsafe {
+        let priority = hw_device_type_priority_store().lock().unwrap();
+        let mut best: Option<(*const sys::AVCodec, usize)> = None;
+        let mut iter_state: *mut c_void = ptr::null_mut();
+        loop {
+            let codec = sys::av_codec_iterate(&mut iter_state);
+            if codec.is_null() {
+                break;
+            }
+            if (*codec).id != codec_id || sys::av_codec_is_decoder(codec) == 0 {
+                continue;
+            }
+            let Some(rank) = hw_config_priority_rank(codec, &priority) else {
+                continue;
+            };
+            if best.is_none_or(|(_, best_rank)| rank < best_rank) {
+                best = Some((codec, rank));
+            }
+        }
+        match best {
+            Some((codec, _)) => codec,
+            None => sys::avcodec_find_decoder(codec_id),
+        }
+    }
 }
 
 pub(crate) fn poisoned_hw_types_for(path: &Path) -> HashSet<i32> {

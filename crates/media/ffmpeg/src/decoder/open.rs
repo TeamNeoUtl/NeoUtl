@@ -10,7 +10,10 @@ use ffmpeg_sys_next as sys;
 use crate::frame::VideoFrame;
 use crate::index::{FrameIndex, build_index};
 
-use super::hw_device::{HwPixFmtBox, hw_get_format, poisoned_hw_types_for, try_init_hw_device};
+use super::hw_device::{
+    HwPixFmtBox, find_decoder_for_codec_id, hw_get_format, poisoned_hw_types_for,
+    try_init_hw_device,
+};
 use super::packet_queue::{PacketQueue, SeekLock};
 use super::{hw_decode_extra_frames, shared_wgpu_queue};
 
@@ -112,7 +115,7 @@ pub(crate) fn open_input(
             fps = (*stream).r_frame_rate.num as f64 / (*stream).r_frame_rate.den.max(1) as f64;
         }
 
-        let codec = sys::avcodec_find_decoder((*(*stream).codecpar).codec_id);
+        let codec = find_decoder_for_codec_id((*(*stream).codecpar).codec_id);
         if codec.is_null() {
             sys::avformat_close_input(&mut fmt_ctx);
             return Err("対応デコーダなし".to_owned());

@@ -68,8 +68,6 @@ local function escape_pattern(value)
     return value:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
 end
 
--- SDKディレクトリ配下の生成ファイル専用。バージョン文字列がプロジェクト全体の
--- 依存関係バージョンと衝突する経路(Cargo.toml/Cargo.lock)には使用しない。
 local function replace_version_in_file(path, current_version, target_version)
     local data = read_file(path)
         if data:find("%z") then return false end
@@ -81,10 +79,6 @@ local function replace_version_in_file(path, current_version, target_version)
     return false
 end
 
--- [package]セクション内のversion行1箇所のみを置換する。
--- 全文字列置換(replace_version_in_file)は`[workspace.dependencies]`配下の
--- 無関係なクレートバージョンがプロジェクトバージョンと偶然一致した場合に
--- 誤って書き換える欠陥を持つため、Cargo.tomlには使用しない。
 local function replace_cargo_package_version(path, current_version, target_version)
     local data = read_file(path)
     local package_start = data:find("%[package%]")
@@ -101,8 +95,6 @@ local function replace_cargo_package_version(path, current_version, target_versi
     write_file(path, header .. updated_section .. tail)
 end
 
--- `sdk/neoutl/<version>/`パス参照のみを置換する。パス区切り文字で挟むため、
--- 依存クレートのバージョン文字列との衝突は構造的に発生しない。
 local function replace_sdk_path_references(path, current_version, target_version)
     local data = read_file(path)
     local pattern = "sdk/neoutl/" .. escape_pattern(current_version) .. "/"
@@ -234,9 +226,6 @@ for _, file in ipairs(files) do
 end
 replace_cargo_package_version(cargo_path, current_version, target_version)
 replace_sdk_path_references(cargo_path, current_version, target_version)
--- Cargo.lockは意図的に触らない。cargoが次回ビルド時にCargo.tomlから
--- 決定論的に再生成する。手動文字列置換は無関係なロック済みクレートの
--- バージョンとの偶然の一致により破損する(本修正の対象バグそのもの)。
 replace_version_in_file(sdk_index, current_version, target_version)
 set_c_header_version(c_master_header, major, minor, patch, target_version)
 

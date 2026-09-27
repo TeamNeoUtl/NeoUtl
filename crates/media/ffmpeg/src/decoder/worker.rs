@@ -226,6 +226,7 @@ fn decode_task(
     let mut decode_budget = (gop_end - key_index + 10).max(500);
     let mut eof = false;
     let av_frame = unsafe { sys::av_frame_alloc() };
+    let mut frames_since_dispatch: u32 = 0;
 
     while decode_budget > 0 {
         decode_budget -= 1;
@@ -288,6 +289,7 @@ fn decode_task(
                 continue;
             };
             *last_decoded_frame = decoded_index;
+            frames_since_dispatch += 1;
 
             if !ram_cache.contains(decoded_index) {
                 if let Some(ram_frame) = convert_frame(ctx, av_frame) {
@@ -330,7 +332,9 @@ fn decode_task(
                 target_dispatched = true;
             }
 
-            if last_requested_frame.load(Ordering::Acquire) != requested_target {
+            if frames_since_dispatch > 0
+                && last_requested_frame.load(Ordering::Acquire) != requested_target
+            {
                 let superseded_by = last_requested_frame.load(Ordering::Acquire);
                 eprintln!(
                     "[neoutl-video-decoder][診断][decode_task中断] requested_target={requested_target} \

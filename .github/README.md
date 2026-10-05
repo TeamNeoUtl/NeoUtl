@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> # 大学受験の為、開発を休止しています。2027年度から開発を再開する予定です。
+
 # NeoUtl: Ever Optimize &mdash; Until Triumphing Liberty.
 
 > [!IMPORTANT]

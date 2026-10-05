@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> # 大学受験の為、開発を休止しています。2027年度から開発を再開する予定です。
+
 # NeoUtl: Ever Optimize &mdash; Until Triumphing Liberty.
 
 [公式サイト](https://neoutl.taisho-guy.org) / [Codeberg](https://codeberg.org/TeamNeoUtl/NeoUtl) / [Zulip](https://taisho-guy.zulipchat.com/join/lz2ljlwmnz2xridgihuprspg/) / [Wiki](https://codeberg.org/TeamNeoUtl/NeoUtl/wiki/Home) / [AviQtl](https://codeberg.org/TeamNeoUtl/NeoUtl/src/branch/aviqtl)

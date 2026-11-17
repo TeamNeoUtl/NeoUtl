@@ -1,466 +1,1123 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-<meta name="generator" content=
-"HTML Tidy for HTML5 for Linux version 5.7.45">
-<meta charset="UTF-8">
-<meta name="viewport" content=
-"width=device-width, initial-scale=1.0">
-<meta name="google-site-verification" content=
-"xmXYtl-62Vi0ktTxGecj5qIXhQ81q76_dCKlFycBDEY">
-<title>NeoUtlのお部屋</title>
-<link rel="icon" href=
-"https://codeberg.org/TeamNeoUtl/neoutl-branding/raw/branch/main/neoutl/icon.svg">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<header>
-<div class="container header-bar"><span class="text-small">Sorry,
-this web page is Japanese only.</span>
-<nav><a href="https://codeberg.org/TeamNeoUtl/NeoUtl" title=
-"Codebergリポジトリ" class="text-small">Codeberg</a> 　<a href=
-"https://taisho-guy.zulipchat.com/join/lz2ljlwmnz2xridgihuprspg/" title="Zulip"
-class="text-small">Zulip</a> 　<a href=
-"https://codeberg.org/TeamNeoUtl/NeoUtl/wiki/Home" title="Wiki"
-class="text-small">Wiki</a></nav>
-</div>
-<hr class="section-hr">
-<div class="container text-center">
-<h1 class="header-title">NeoUtlのお部屋</h1>
-</div>
-</header>
-<hr class="section-hr">
-<main>
-<section>
-<div class="container">
-<h2 class="section-title">NeoUtlとは…</h2>
-<div><b>AviUtl 1.10</b> & <b>ExEdit
-0.92</b>の操作感を踏襲しつつ、<b>AviUtlを超える性能</b>を持つ動画編集ソフトを目標とするプロジェクトです。<br>
-目標達成の為に、「<b>LinuxやmacOSでも動く、より速い、より安全、より拡張性が高い、AviUtlライクな自由ソフトウェア</b>」を開発しています。</div>
-</div>
-</section>
-<hr class="section-hr gap-before">
-<section>
-<div class="container">
-<h2 class="section-title"><span class="accent">★</span> インフォメーション
-<span class="accent">★</span></h2>
-<div class="info-box">
-<div class="info-box-inner">
-<details>
-<summary><b>大学受験の為に開発を休止しています</b></summary>
-<p>
-  2027年度に開発を再開する予定です。
-</p></details>
-</div>
-</div>
-<div class="info-box">
-<div class="info-box-inner">
-<details>
-<summary><b>公式Zulipを開設しました</b></summary>
-<p>
-  <b>NeoUtlについて気軽に話せるコミュニティです。</b><br>
-  開発状況の確認、質問、バグ報告、機能への提案などを、
-  NeoUtlの開発者やユーザーと交流しながら行えます。
-  <a href="https://taisho-guy.zulipchat.com/join/lz2ljlwmnz2xridgihuprspg/">こちらから参加する</a>ことができます。<br>
-  ブラウザからのご参加は勿論、デスクトップ・モバイル向けの
-  <a href="https://zulip.com/apps/">Zulipアプリ</a>もご利用頂けます。
-</p></details>
-</div>
-</div>
-<div class="info-box">
-<div class="info-box-inner">
-<details>
-<summary><b>NeoUtl 0.8を公開しました</b></summary>
-<p>0.8では、</p>
-<ul>
-  <li>カーブエディタのリファクタリング</li>
-  <li>GUIの余白の整理</li>
-  <li>マルチウィンドウの挙動を安定化</li>
-  <li>SDKの整備</li>
-  <li>リポジトリの移管・分割</li>
-  <li>コード品質の向上</li>
-  <li>様々なロジックバグの修正</li>
-  <li>プレビュー・カメラの拡張（実験的）</li>
-</ul>
-<p>等が新たに実装されました。</p>
-<p>現在、0.9に向け、</p>
-<ul>
-  <li>パッケージ管理機能</li>
-  <li>様々なオブジェクト・エフェクトの修正・拡充</li>
-  <li>プラグインリポジトリ・署名検証機構</li>
-  <li>プレビュー・カメラの安定化</li>
-</ul>
-<p>等に取り組んでおります。
-<br>
-今後共、NeoUtlにご期待下さい。
-<br>
-<a href=
-"https://codeberg.org/TeamNeoUtl/NeoUtl/src/branch/main/TODO.md">TODO.md</a>では今後のロードマップを、
-<a href=
-"https://codeberg.org/TeamNeoUtl/NeoUtl/commits/branch/main">コミット履歴</a>ではソースコードの更新を追跡頂けます。<br>
-</p>
-</details>
-</div>
-</div>
-<table class="data-table" id="commit-table">
-<tbody id="commit-tbody">
-<tr class="row-accent">
-<th colspan="2"><span class="text-link"><b>最近のコミット</b></span></th>
-</tr>
-<tr class="row-accent text-center">
-<th>日時</th>
-<th>コミットメッセージ</th>
-</tr>
-<tr id="commit-loading-row">
-<td colspan="2" class="text-small">コミット履歴を取得中...</td>
-</tr>
-<tr>
-<td colspan="2"><a href=
-"https://codeberg.org/TeamNeoUtl/NeoUtl/commits/branch/main" class=
-"float-right" target="_blank" rel="noopener">全てのコミット履歴を見る</a></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<hr class="section-hr gap-before">
-<section>
-<div class="container">
-<h2 class="section-title"><span class="accent">★</span> ダウンロード
-<span class="accent">★</span></h2>
-<div>
-<table class="data-table dl-table" id="download-table-neoutl"
-data-source="codeberg" data-repo="TeamNeoUtl/NeoUtl"
-data-suppress-version="0.0.95">
-<tbody>
-<tr class="row-accent">
-<th colspan="4"><span class="text-link"><b>NeoUtl</b></span></th>
-</tr>
-<tr>
-<td colspan="4"><span class="text-small">AviUtl 1.10 / ExEdit
-0.92の操作感を踏襲する動画編集ソフトウェアです。</span></td>
-</tr>
-<tr class="row-accent text-center">
-<th></th>
-<th>Windows</th>
-<th>macOS</th>
-<th>Linux</th>
-</tr>
-<tr>
-<td class="text-center"><b>x86_64</b></td>
-<td><a class="dl-item" data-platform="windows" data-arch="x86_64"
-href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases">取得中</a></td>
-<td><a class="dl-item" data-platform="apple" data-arch="x86_64"
-href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases">取得中</a></td>
-<td><a class="dl-item" data-platform="linux" data-arch="x86_64"
-href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases">取得中</a></td>
-</tr>
-<tr>
-<td class="text-center"><b>arm64</b></td>
-<td><a class="dl-item" data-platform="windows" data-arch="arm64"
-href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases">取得中</a></td>
-<td><a class="dl-item" data-platform="apple" data-arch="arm64"
-href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases">取得中</a></td>
-<td><a class="dl-item" data-platform="linux" data-arch="arm64"
-href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases">取得中</a></td>
-</tr>
-<tr>
-<td colspan="4"><span class=
-"dl-info">過去のリリース情報を取得中...</span><a href=
-"https://codeberg.org/TeamNeoUtl/NeoUtl/releases" class=
-"float-right">過去のバージョンはこちら</a></td>
-</tr>
-</tbody>
-</table>
-<br>
-<table class="data-table dl-table" id="download-table-aviqtl"
-data-source="codeberg-tag" data-repo="TeamNeoUtl/NeoUtl" data-tag=
-"0.0.95-Unstable">
-<tbody>
-<tr class="row-accent">
-<th colspan="4"><span class="text-link"><b>AviQtl</b></span></th>
-</tr>
-<tr>
-<td colspan="4"><span class=
-"text-small">NeoUtlの源流となる旧プロジェクトです。開発終了済で、0.0.95以降更新されません。</span></td>
-</tr>
-<tr class="row-accent text-center">
-<th></th>
-<th>Windows</th>
-<th>macOS</th>
-<th>Linux</th>
-</tr>
-<tr>
-<td class="text-center"><b>x86_64</b></td>
-<td><a class="dl-item" data-platform="windows" data-arch="x86_64"
-href=
-"https://codeberg.org/TeamNeoUtl/NeoUtl/releases/tag/0.0.95-Unstable">
-取得中</a></td>
-<td>—</td>
-<td><a class="dl-item" data-platform="linux" data-arch="x86_64"
-href=
-"https://codeberg.org/TeamNeoUtl/NeoUtl/releases/tag/0.0.95-Unstable">
-取得中</a></td>
-</tr>
-<tr>
-<td class="text-center"><b>arm64</b></td>
-<td>—</td>
-<td><a class="dl-item" data-platform="apple" data-arch="arm64"
-href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases/tag/0.0.95-Unstable">
-取得中</a></td>
-<td>—</td>
-</tr>
-<tr>
-<td colspan="4"><span class="dl-info">リリース情報を取得中...</span><a href=
-"https://codeberg.org/TeamNeoUtl/NeoUtl/releases/tag/0.0.95-Unstable"
-target="_blank" rel="noopener" class=
-"float-right">リリースページはこちら</a></td>
-</tr>
-</tbody>
-</table>
-<br>
-<table class="data-table dl-table" id="download-table-aviqtlplus"
-data-source="github" data-repo="GT-610/freya-nle">
-<tbody>
-<tr class="row-accent">
-<th colspan="4"><span class="text-link"><b>Freya NLE</b></span></th>
-</tr>
-<tr>
-<td colspan="4"><span class=
-"text-small">GT-610氏によるAviQtlのフォークプロジェクトです。GitHub上で開発が継続されています。</span></td>
-</tr>
-<tr class="row-accent text-center">
-<th></th>
-<th>Windows</th>
-<th>macOS</th>
-<th>Linux</th>
-</tr>
-<tr>
-<td class="text-center"><b>x86_64</b></td>
-<td><a class="dl-item" data-platform="windows" data-arch="x86_64"
-href="https://github.com/GT-610/freya-nle/releases" target=
-"_blank" rel="noopener">取得中</a></td>
-<td><a class="dl-item" data-platform="apple" data-arch="x86_64"
-href="https://github.com/GT-610/freya-nle/releases" target=
-"_blank" rel="noopener">取得中</a></td>
-<td><a class="dl-item" data-platform="linux" data-arch="x86_64"
-href="https://github.com/GT-610/freya-nle/releases" target=
-"_blank" rel="noopener">取得中</a></td>
-</tr>
-<tr>
-<td class="text-center"><b>arm64</b></td>
-<td><a class="dl-item" data-platform="windows" data-arch="arm64"
-href="https://github.com/GT-610/freya-nle/releases" target=
-"_blank" rel="noopener">取得中</a></td>
-<td><a class="dl-item" data-platform="apple" data-arch="arm64"
-href="https://github.com/GT-610/freya-nle/releases" target=
-"_blank" rel="noopener">取得中</a></td>
-<td><a class="dl-item" data-platform="linux" data-arch="arm64"
-href="https://github.com/GT-610/freya-nle/releases" target=
-"_blank" rel="noopener">取得中</a></td>
-</tr>
-<tr>
-<td colspan="4"><span class="dl-info">リリース情報を取得中...</span><a href=
-"https://github.com/GT-610/freya-nle/releases" target="_blank"
-rel="noopener" class="float-right">過去のバージョンはこちら</a></td>
-</tr>
-</tbody>
-</table>
-<br>
-<table class="data-table">
-<tbody>
-<tr class="row-accent">
-<th colspan="2"><span class="text-link"><b>SDK</b></span></th>
-</tr>
-<tr>
-<td colspan="2"><span class=
-"text-small">NeoUtlを拡張するためのSDKです。Rust（ネイティブ）及びC向けに公開されています。</span></td>
-</tr>
-<tr>
-<td class="text-center"><b>Zip</b></td>
-<td><a href=
-"https://codeberg.org/TeamNeoUtl/neoutl-sdk/archive/main.zip">neoutl-sdk-main.zip</a></td>
-</tr>
-<tr>
-<td class="text-center"><b>Git</b></td>
-<td><pre><code>git clone https://codeberg.org/TeamNeoUtl/neoutl-sdk.git</code></pre></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</section>
-<hr class="section-hr gap-before">
-<section>
-<div class="container">
-<h2 class="section-title"><span class="accent">★</span> ビルド手順
-<span class="accent">★</span></h2>
-<div>
-<table class="data-table">
-<tbody>
-<tr class="row-accent">
-<th colspan="3"><span class="text-link"><b>NeoUtl</b></span></th>
-</tr>
-<tr>
-<td colspan="3"><span class=
-"text-small">最新のNeoUtl（<code>main</code>ブランチ）はRustで実装されています。ビルドを行うには、予め
-<b>Rust</b>、<b>Clang</b>、<b>Mold</b>、<b>FFmpeg</b>
-をシステムにインストールしてください。</span></td>
-</tr>
-<tr>
-<td colspan="3"><span class=
-"text-small"><b>ソースコードの取得とビルド</b></span><br>
-<pre><code>git clone "https://codeberg.org/TeamNeoUtl/NeoUtl.git"
+    <head>
+        <meta
+            name="generator"
+            content="HTML Tidy for HTML5 for Linux version 5.7.45"
+        />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="google-site-verification"
+            content="xmXYtl-62Vi0ktTxGecj5qIXhQ81q76_dCKlFycBDEY"
+        />
+        <title>NeoUtlのお部屋</title>
+        <link
+            rel="icon"
+            href="https://codeberg.org/TeamNeoUtl/neoutl-branding/raw/branch/main/neoutl/icon.svg"
+        />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <header>
+            <div class="container header-bar">
+                <span class="text-small"
+                    >Sorry, this web page is Japanese only.</span
+                >
+                <nav>
+                    <a
+                        href="https://codeberg.org/TeamNeoUtl/NeoUtl"
+                        title="Codebergリポジトリ"
+                        class="text-small"
+                        >Codeberg</a
+                    >
+                    <a
+                        href="https://taisho-guy.zulipchat.com/join/lz2ljlwmnz2xridgihuprspg/"
+                        title="Zulip"
+                        class="text-small"
+                        >Zulip</a
+                    >
+                    <a
+                        href="https://codeberg.org/TeamNeoUtl/NeoUtl/wiki/Home"
+                        title="Wiki"
+                        class="text-small"
+                        >Wiki</a
+                    >
+                </nav>
+            </div>
+            <hr class="section-hr" />
+            <div class="container text-center">
+                <h1 class="header-title">NeoUtlのお部屋</h1>
+            </div>
+        </header>
+        <hr class="section-hr" />
+        <main>
+            <section>
+                <div class="container">
+                    <h2 class="section-title">NeoUtlとは…</h2>
+                    <div>
+                        <b>AviUtl 1.10</b> &
+                        <b>ExEdit 0.92</b
+                        >の操作感を踏襲しつつ、<b>AviUtlを超える性能</b>を持つ動画編集ソフトを目標とするプロジェクトです。<br />
+                        目標達成の為に、「<b>LinuxやmacOSでも動く、より速い、より安全、より拡張性が高い、AviUtlライクな自由ソフトウェア</b>」を開発しています。
+                    </div>
+                </div>
+            </section>
+            <hr class="section-hr gap-before" />
+            <section>
+                <div class="container">
+                    <h2 class="section-title">
+                        <span class="accent">★</span> インフォメーション
+                        <span class="accent">★</span>
+                    </h2>
+
+                    <div class="info-box">
+                        <div class="info-box-inner">
+                            <details>
+                                <summary>
+                                    <b
+                                        >非公開で新しい GUI
+                                        クレートを開発しています</b
+                                    >
+                                </summary>
+                                <p>
+                                    NeoUtl はこれまで、様々な GUI
+                                    を採用し、検証してきました。 しかし、どの
+                                    GUI も NeoUtl
+                                    のニーズを満たすことは難しかったので、NeoUtl
+                                    の開発を休む傍ら、新しい GUI
+                                    クレート「contixion」を開発することにしました。
+                                    仕様や実装の基盤は既に堅牢に固められつつあり、開発を再開する際に、NeoUtl
+                                    の GUI 実装を contixion に移植する予定です。
+                                </p>
+                            </details>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-inner">
+                            <details>
+                                <summary>
+                                    <b>Madoka Launcher をリリースしました</b>
+                                </summary>
+                                <p>
+                                    Madoka Launcher は、NeoUtl
+                                    だけでなく、AviUtl（ExEdit 0 / 2）、YMM4
+                                    、Freya-NLE
+                                    等のバージョン、複数インスタンス、プラグインを一箇所で管理できる便利なツールです。
+                                    AviUtl２カタログ等の既存のリポジトリを参照するため、常に最新のプラグインを簡単にダウンロードすることが可能です。
+                                </p>
+                            </details>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-inner">
+                            <details>
+                                <summary>
+                                    <b>大学受験の為に開発を休止しています</b>
+                                </summary>
+                                <p>2027年度に開発を再開する予定です。</p>
+                            </details>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-inner">
+                            <details>
+                                <summary>
+                                    <b>公式Zulipを開設しました</b>
+                                </summary>
+                                <p>
+                                    <b
+                                        >NeoUtlについて気軽に話せるコミュニティです。</b
+                                    ><br />
+                                    開発状況の確認、質問、バグ報告、機能への提案などを、
+                                    NeoUtlの開発者やユーザーと交流しながら行えます。
+                                    <a
+                                        href="https://taisho-guy.zulipchat.com/join/lz2ljlwmnz2xridgihuprspg/"
+                                        >こちらから参加する</a
+                                    >ことができます。<br />
+                                    ブラウザからのご参加は勿論、デスクトップ・モバイル向けの
+                                    <a href="https://zulip.com/apps/"
+                                        >Zulipアプリ</a
+                                    >もご利用頂けます。
+                                </p>
+                            </details>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-inner">
+                            <details>
+                                <summary>
+                                    <b>NeoUtl 0.8を公開しました</b>
+                                </summary>
+                                <p>0.8では、</p>
+                                <ul>
+                                    <li>カーブエディタのリファクタリング</li>
+                                    <li>GUIの余白の整理</li>
+                                    <li>マルチウィンドウの挙動を安定化</li>
+                                    <li>SDKの整備</li>
+                                    <li>リポジトリの移管・分割</li>
+                                    <li>コード品質の向上</li>
+                                    <li>様々なロジックバグの修正</li>
+                                    <li>プレビュー・カメラの拡張（実験的）</li>
+                                </ul>
+                                <p>等が新たに実装されました。</p>
+                                <p>現在、0.9に向け、</p>
+                                <ul>
+                                    <li>パッケージ管理機能</li>
+                                    <li>
+                                        様々なオブジェクト・エフェクトの修正・拡充
+                                    </li>
+                                    <li>プラグインリポジトリ・署名検証機構</li>
+                                    <li>プレビュー・カメラの安定化</li>
+                                </ul>
+                                <p>
+                                    等に取り組んでおります。
+                                    <br />
+                                    今後共、NeoUtlにご期待下さい。
+                                    <br />
+                                    <a
+                                        href="https://codeberg.org/TeamNeoUtl/NeoUtl/src/branch/main/TODO.md"
+                                        >TODO.md</a
+                                    >では今後のロードマップを、
+                                    <a
+                                        href="https://codeberg.org/TeamNeoUtl/NeoUtl/commits/branch/main"
+                                        >コミット履歴</a
+                                    >ではソースコードの更新を追跡頂けます。<br />
+                                </p>
+                            </details>
+                        </div>
+                    </div>
+
+                    <table class="data-table" id="commit-table">
+                        <tbody id="commit-tbody">
+                            <tr class="row-accent">
+                                <th colspan="2">
+                                    <span class="text-link"
+                                        ><b>最近のコミット</b></span
+                                    >
+                                </th>
+                            </tr>
+                            <tr class="row-accent text-center">
+                                <th>日時</th>
+                                <th>コミットメッセージ</th>
+                            </tr>
+                            <tr id="commit-loading-row">
+                                <td colspan="2" class="text-small">
+                                    コミット履歴を取得中...
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <a
+                                        href="https://codeberg.org/TeamNeoUtl/NeoUtl/commits/branch/main"
+                                        class="float-right"
+                                        target="_blank"
+                                        rel="noopener"
+                                        >全てのコミット履歴を見る</a
+                                    >
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <hr class="section-hr gap-before" />
+            <section>
+                <div class="container">
+                    <h2 class="section-title">
+                        <span class="accent">★</span> ダウンロード
+                        <span class="accent">★</span>
+                    </h2>
+                    <div>
+                        <table
+                            class="data-table dl-table"
+                            id="download-table-neoutl"
+                            data-source="codeberg"
+                            data-repo="TeamNeoUtl/NeoUtl"
+                            data-suppress-version="0.0.95"
+                        >
+                            <tbody>
+                                <tr class="row-accent">
+                                    <th colspan="4">
+                                        <span class="text-link"
+                                            ><b>NeoUtl</b></span
+                                        >
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <span class="text-small"
+                                            >Team NeoUtl
+                                            が主導する動画編集ソフトです。2026年度一杯迄開発を休止しています。</span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr class="row-accent text-center">
+                                    <th></th>
+                                    <th>Windows</th>
+                                    <th>macOS</th>
+                                    <th>Linux</th>
+                                </tr>
+                                <tr>
+                                    <td class="text-center"><b>x86_64</b></td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="windows"
+                                            data-arch="x86_64"
+                                            href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="apple"
+                                            data-arch="x86_64"
+                                            href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="linux"
+                                            data-arch="x86_64"
+                                            href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center"><b>arm64</b></td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="windows"
+                                            data-arch="arm64"
+                                            href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="apple"
+                                            data-arch="arm64"
+                                            href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="linux"
+                                            data-arch="arm64"
+                                            href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <span class="dl-info"
+                                            >過去のリリース情報を取得中...</span
+                                        ><a
+                                            href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases"
+                                            class="float-right"
+                                            >過去のバージョンはこちら</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br />
+                        <table
+                            class="data-table dl-table"
+                            id="download-table-macutl"
+                            data-source="github"
+                            data-repo="Ren9618/MacUtl"
+                        >
+                            <tbody>
+                                <tr class="row-accent">
+                                    <th colspan="4">
+                                        <span class="text-link"
+                                            ><b>MacUtl</b></span
+                                        >
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <span class="text-small"
+                                            >Ren9618 氏による NeoUtl
+                                            のフォークです。NeoUtl を macOS
+                                            に移植しつつ、独自のユーザー体験を付加しています。</span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr class="row-accent text-center">
+                                    <th></th>
+                                    <th>Windows</th>
+                                    <th>macOS</th>
+                                    <th>Linux</th>
+                                </tr>
+                                <tr>
+                                    <td class="text-center"><b>x86_64</b></td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="windows"
+                                            data-arch="x86_64"
+                                            href="https://github.com/Ren9618/MacUtl/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="apple"
+                                            data-arch="x86_64"
+                                            href="https://github.com/Ren9618/MacUtl/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="linux"
+                                            data-arch="x86_64"
+                                            href="https://github.com/Ren9618/MacUtl/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center"><b>arm64</b></td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="windows"
+                                            data-arch="arm64"
+                                            href="https://github.com/Ren9618/MacUtl/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="apple"
+                                            data-arch="arm64"
+                                            href="https://github.com/Ren9618/MacUtl/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="linux"
+                                            data-arch="arm64"
+                                            href="https://github.com/Ren9618/MacUtl/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <span class="dl-info"
+                                            >リリース情報を取得中...</span
+                                        ><a
+                                            href="https://github.com/Ren9618/MacUtl/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            class="float-right"
+                                            >過去のバージョンはこちら</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br />
+                        <table
+                            class="data-table dl-table"
+                            id="download-table-aviqtlplus"
+                            data-source="github"
+                            data-repo="GT-610/freya-nle"
+                        >
+                            <tbody>
+                                <tr class="row-accent">
+                                    <th colspan="4">
+                                        <span class="text-link"
+                                            ><b>Freya NLE</b></span
+                                        >
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <span class="text-small"
+                                            >GT-610 氏による AviQtl
+                                            のフォークです。NeoUtl
+                                            と同じ出発点を共有する姉妹プロジェクトです。</span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr class="row-accent text-center">
+                                    <th></th>
+                                    <th>Windows</th>
+                                    <th>macOS</th>
+                                    <th>Linux</th>
+                                </tr>
+                                <tr>
+                                    <td class="text-center"><b>x86_64</b></td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="windows"
+                                            data-arch="x86_64"
+                                            href="https://github.com/GT-610/freya-nle/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="apple"
+                                            data-arch="x86_64"
+                                            href="https://github.com/GT-610/freya-nle/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="linux"
+                                            data-arch="x86_64"
+                                            href="https://github.com/GT-610/freya-nle/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center"><b>arm64</b></td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="windows"
+                                            data-arch="arm64"
+                                            href="https://github.com/GT-610/freya-nle/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="apple"
+                                            data-arch="arm64"
+                                            href="https://github.com/GT-610/freya-nle/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="linux"
+                                            data-arch="arm64"
+                                            href="https://github.com/GT-610/freya-nle/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >取得中</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <span class="dl-info"
+                                            >リリース情報を取得中...</span
+                                        ><a
+                                            href="https://github.com/GT-610/freya-nle/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            class="float-right"
+                                            >過去のバージョンはこちら</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br />
+                        <table
+                            class="data-table dl-table"
+                            id="download-table-aviqtl"
+                            data-source="codeberg-tag"
+                            data-repo="TeamNeoUtl/NeoUtl"
+                            data-tag="0.0.95-Unstable"
+                        >
+                            <tbody>
+                                <tr class="row-accent">
+                                    <th colspan="4">
+                                        <span class="text-link"
+                                            ><b>AviQtl</b></span
+                                        >
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <span class="text-small"
+                                            >NeoUtl
+                                            の源流となる旧プロジェクトです。開発終了済で、0.0.95
+                                            以降更新されません。</span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr class="row-accent text-center">
+                                    <th></th>
+                                    <th>Windows</th>
+                                    <th>macOS</th>
+                                    <th>Linux</th>
+                                </tr>
+                                <tr>
+                                    <td class="text-center"><b>x86_64</b></td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="windows"
+                                            data-arch="x86_64"
+                                            href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases/tag/0.0.95-Unstable"
+                                        >
+                                            取得中</a
+                                        >
+                                    </td>
+                                    <td>—</td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="linux"
+                                            data-arch="x86_64"
+                                            href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases/tag/0.0.95-Unstable"
+                                        >
+                                            取得中</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center"><b>arm64</b></td>
+                                    <td>—</td>
+                                    <td>
+                                        <a
+                                            class="dl-item"
+                                            data-platform="apple"
+                                            data-arch="arm64"
+                                            href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases/tag/0.0.95-Unstable"
+                                        >
+                                            取得中</a
+                                        >
+                                    </td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <span class="dl-info"
+                                            >リリース情報を取得中...</span
+                                        ><a
+                                            href="https://codeberg.org/TeamNeoUtl/NeoUtl/releases/tag/0.0.95-Unstable"
+                                            target="_blank"
+                                            rel="noopener"
+                                            class="float-right"
+                                            >リリースページはこちら</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br />
+                        <table class="data-table">
+                            <tbody>
+                                <tr class="row-accent">
+                                    <th colspan="2">
+                                        <span class="text-link"
+                                            ><b>SDK</b></span
+                                        >
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <span class="text-small"
+                                            >NeoUtl を拡張するための SDK
+                                            です。Rust（ネイティブ）及び C
+                                            向けに公開されています。</span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center"><b>Zip</b></td>
+                                    <td>
+                                        <a
+                                            href="https://codeberg.org/TeamNeoUtl/neoutl-sdk/archive/main.zip"
+                                            >neoutl-sdk-main.zip</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center"><b>Git</b></td>
+                                    <td>
+                                        <pre><code>git clone https://codeberg.org/TeamNeoUtl/neoutl-sdk.git</code></pre>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <hr class="section-hr gap-before" />
+            <section>
+                <div class="container">
+                    <h2 class="section-title">
+                        <span class="accent">★</span> ビルド手順
+                        <span class="accent">★</span>
+                    </h2>
+                    <div>
+                        <table class="data-table">
+                            <tbody>
+                                <tr class="row-accent">
+                                    <th colspan="3">
+                                        <span class="text-link"
+                                            ><b>NeoUtl</b></span
+                                        >
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <span class="text-small"
+                                            >最新のNeoUtl（<code>main</code>ブランチ）はRustで実装されています。ビルドを行うには、予め
+                                            <b>Rust</b
+                                            >、<b>Clang</b>、<b>Mold</b>、<b
+                                                >FFmpeg</b
+                                            >
+                                            をシステムにインストールしてください。</span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <span class="text-small"
+                                            ><b
+                                                >ソースコードの取得とビルド</b
+                                            ></span
+                                        ><br />
+                                        <pre><code>git clone "https://codeberg.org/TeamNeoUtl/NeoUtl.git"
 cd NeoUtl
 git switch main
 cargo xtask build --release</code></pre>
-<span class="text-small">実行可能ファイルは <code>target/release</code>
-以下に生成されます。</span></td>
-</tr>
-</tbody>
-</table>
-<br>
-<table class="data-table">
-<tbody>
-<tr class="row-accent">
-<th colspan="3"><span class="text-link"><b>AviQtl</b></span></th>
-</tr>
-<tr>
-<td colspan="3"><span class=
-"text-small">NeoUtlの源流となる旧プロジェクトです。ビルドには <b>Python3</b> 及び
-<b>PySide6</b> 環境が必要です。</span></td>
-</tr>
-<tr>
-<td colspan="3"><span class=
-"text-small"><b>ソースコードの取得とビルド</b></span><br>
-<pre><code>git clone "https://codeberg.org/TeamNeoUtl/NeoUtl.git"
+                                        <span class="text-small"
+                                            >実行可能ファイルは
+                                            <code>target/release</code>
+                                            以下に生成されます。</span
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br />
+                        <table class="data-table">
+                            <tbody>
+                                <tr class="row-accent">
+                                    <th colspan="3">
+                                        <span class="text-link"
+                                            ><b>AviQtl</b></span
+                                        >
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <span class="text-small"
+                                            >NeoUtlの源流となる旧プロジェクトです。ビルドには
+                                            <b>Python3</b> 及び
+                                            <b>PySide6</b>
+                                            環境が必要です。</span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <span class="text-small"
+                                            ><b
+                                                >ソースコードの取得とビルド</b
+                                            ></span
+                                        ><br />
+                                        <pre><code>git clone "https://codeberg.org/TeamNeoUtl/NeoUtl.git"
 cd NeoUtl
 git switch aviqtl
 python3 BUILD.py</code></pre>
-<span class="text-small">実行可能ファイルは <code>build</code>
-以下に生成されます。</span></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</section>
-<hr class="section-hr">
-<section>
-<div class="container">
-<h2 class="section-title"><span class="accent">★</span> 採用技術
-<span class="accent">★</span></h2>
-<div><span class=
-"text-small">NeoUtlは、以下の素晴らしいオープンソースプロジェクトと言語の上に成り立っています。</span><br>
+                                        <span class="text-small"
+                                            >実行可能ファイルは
+                                            <code>build</code>
+                                            以下に生成されます。</span
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <hr class="section-hr" />
+            <section>
+                <div class="container">
+                    <h2 class="section-title">
+                        <span class="accent">★</span> 採用技術
+                        <span class="accent">★</span>
+                    </h2>
+                    <div>
+                        <span class="text-small"
+                            >NeoUtlは、以下の素晴らしいオープンソースプロジェクトと言語の上に成り立っています。</span
+                        ><br />
 
-<br>
-<table class="data-table">
-<tbody>
-<tr class="row-accent">
-<th colspan="3"><span class=
-"text-link"><b>言語・フレームワーク</b></span></th>
-</tr>
-<tr>
-<td><a href="https://www.rust-lang.org/" target="_blank" rel=
-"noopener">Rust</a></td>
-<td colspan="2"><span class=
-"text-small">安全性と高パフォーマンスを両立した、現行プロジェクトのメイン実装言語です。<br>
-<span class="text-xsmall">Language</span></span></td>
-</tr>
-<tr>
-<td><a href="https://www.egui.rs/" target="_blank" rel=
-"noopener">egui</a></td>
-<td colspan="2"><span class=
-"text-small">UI/UXの構築に採用されている、ネイティブかつ軽量なGUIツールキットです。<br>
-<span class="text-xsmall">GPLv3 / Commercial</span></span></td>
-</tr>
-<tr>
-<td><a href="https://wgpu.rs/" target="_blank" rel=
-"noopener">wgpu</a></td>
-<td colspan="2"><span class=
-"text-small">GPUを最大限に引き出し、クロスプラットフォームで高速なプレビューを支えるグラフィックスAPIです。<br>
-<span class="text-xsmall">MIT / Apache-2.0</span></span></td>
-</tr>
-<tr>
-<td><a href="https://shader-slang.org/" target="_blank" rel=
-"noopener">Slang</a></td>
-<td colspan="2"><span class=
-"text-small">エフェクト等のシェーダ記述に採用されている、Khronosが管理するシェーディング言語・コンパイラです。<br>
+                        <br />
+                        <table class="data-table">
+                            <tbody>
+                                <tr class="row-accent">
+                                    <th colspan="3">
+                                        <span class="text-link"
+                                            ><b>言語・フレームワーク</b></span
+                                        >
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a
+                                            href="https://www.rust-lang.org/"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >Rust</a
+                                        >
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="text-small"
+                                            >安全性と高パフォーマンスを両立した、現行プロジェクトのメイン実装言語です。<br />
+                                            <span class="text-xsmall"
+                                                >Language</span
+                                            ></span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a
+                                            href="https://www.egui.rs/"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >egui</a
+                                        >
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="text-small"
+                                            >UI/UXの構築に採用されている、ネイティブかつ軽量なGUIツールキットです。<br />
+                                            <span class="text-xsmall"
+                                                >GPLv3 / Commercial</span
+                                            ></span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a
+                                            href="https://wgpu.rs/"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >wgpu</a
+                                        >
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="text-small"
+                                            >GPUを最大限に引き出し、クロスプラットフォームで高速なプレビューを支えるグラフィックスAPIです。<br />
+                                            <span class="text-xsmall"
+                                                >MIT / Apache-2.0</span
+                                            ></span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a
+                                            href="https://shader-slang.org/"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >Slang</a
+                                        >
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="text-small"
+                                            >エフェクト等のシェーダ記述に採用されている、Khronosが管理するシェーディング言語・コンパイラです。<br />
 
-<span class="text-xsmall">MIT</span></span></td>
-</tr>
-<tr>
-<td><a href="https://github.com/leudz/shipyard" target="_blank"
-rel="noopener">Shipyard</a></td>
-<td colspan="2"><span class=
-"text-small">データの効率的な管理と高速な処理を支える、Entity Component System (ECS)
-クレートです。<br>
-<span class="text-xsmall">MIT / Apache-2.0</span></span></td>
-</tr>
-<tr>
-<td><a href="https://tokio.rs/" target="_blank" rel=
-"noopener">Tokio</a></td>
-<td colspan="2"><span class=
-"text-small">マルチスレッド環境での非同期処理やイベント駆動制御を司る基盤です。<br>
-<span class="text-xsmall">MIT</span></span></td>
-</tr>
-<tr>
-<td><a href="https://github.com/pdeljanov/Symphonia" target=
-"_blank" rel="noopener">symphonia</a></td>
-<td colspan="2"><span class=
-"text-small">純Rust実装の音声デコードを担い、gpu-videoを補完します。<br>
-<span class="text-xsmall">MPL-2.0</span></span></td>
-</tr>
-<tr>
-<td><a href="https://ffmpeg.org/" target="_blank"
-rel="noopener">FFmpeg</a></td>
-<td colspan="2"><span class=
-"text-small">動画や音声のデコード、エンコードを司ります。<br>
-<span class="text-xsmall">GPLv3+</span></span></td>
-</tr>
-</tbody>
-</table>
-<br></div>
-</div>
-</section>
-<hr class="section-hr">
-<section>
-<div class="container">
-<h2 class="section-title"><span class="accent">★</span> 使用上の注意
-<span class="accent">★</span></h2>
-<div>This program is free software: you can redistribute it and/or
-modify it under the terms of the GNU Affero General Public License
-as published by the Free Software Foundation, either version 3 of
-the License, or (at your option) any later version.<br>
-<br>
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-Affero General Public License for more details.<br>
-<br>
-You should have received a copy of the GNU Affero General Public
-License along with this program. If not, see <a href=
-"https://www.gnu.org/licenses/agpl.html" target="_blank" rel=
-"noopener">https://www.gnu.org/licenses/agpl.html</a>.</div>
-</div>
-</section>
-<hr class="section-hr gap-before">
-<ins class="adsbygoogle sf-hidden ad-container"
-data-ad-client="ca-pub-6947625383714468" data-ad-slot="8392879036"
-data-ad-format="auto" data-full-width-responsive=
-"true"></ins></main>
-<footer>
-<div class="container text-center">リンクはフリーですのでご自由にどうぞ。<br>
-<br>
-by <a href="https://codeberg.org/TeamNeoUtl" target="_blank" rel=
-"noopener">Team NeoUtl</a></div>
-<hr class="section-hr">
-<div class="container header-bar"><span class="text-small" id=
-"neoutl-counter">今日: <b>--</b> / 昨日: <b>--</b> / 累計:
-<b>--</b></span> <span class="text-small"><a href=
-"https://spring-fragrance.mints.ne.jp/aviutl/" target="_blank" rel=
-"noopener">AviUtlのお部屋はこちら</a></span></div>
-</footer>
-<script src="script.js"></script>
-</body>
+                                            <span class="text-xsmall"
+                                                >MIT</span
+                                            ></span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a
+                                            href="https://github.com/leudz/shipyard"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >Shipyard</a
+                                        >
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="text-small"
+                                            >データの効率的な管理と高速な処理を支える、Entity
+                                            Component System (ECS)
+                                            クレートです。<br />
+                                            <span class="text-xsmall"
+                                                >MIT / Apache-2.0</span
+                                            ></span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a
+                                            href="https://tokio.rs/"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >Tokio</a
+                                        >
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="text-small"
+                                            >マルチスレッド環境での非同期処理やイベント駆動制御を司る基盤です。<br />
+                                            <span class="text-xsmall"
+                                                >MIT</span
+                                            ></span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a
+                                            href="https://github.com/pdeljanov/Symphonia"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >symphonia</a
+                                        >
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="text-small"
+                                            >純Rust実装の音声デコードを担い、gpu-videoを補完します。<br />
+                                            <span class="text-xsmall"
+                                                >MPL-2.0</span
+                                            ></span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a
+                                            href="https://ffmpeg.org/"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >FFmpeg</a
+                                        >
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="text-small"
+                                            >動画や音声のデコード、エンコードを司ります。<br />
+                                            <span class="text-xsmall"
+                                                >GPLv3+</span
+                                            ></span
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br />
+                    </div>
+                </div>
+            </section>
+            <hr class="section-hr" />
+            <section>
+                <div class="container">
+                    <h2 class="section-title">
+                        <span class="accent">★</span> 使用上の注意
+                        <span class="accent">★</span>
+                    </h2>
+                    <div>
+                        This program is free software: you can redistribute it
+                        and/or modify it under the terms of the GNU Affero
+                        General Public License as published by the Free Software
+                        Foundation, either version 3 of the License, or (at your
+                        option) any later version.<br />
+                        <br />
+                        This program is distributed in the hope that it will be
+                        useful, but WITHOUT ANY WARRANTY; without even the
+                        implied warranty of MERCHANTABILITY or FITNESS FOR A
+                        PARTICULAR PURPOSE. See the GNU Affero General Public
+                        License for more details.<br />
+                        <br />
+                        You should have received a copy of the GNU Affero
+                        General Public License along with this program. If not,
+                        see
+                        <a
+                            href="https://www.gnu.org/licenses/agpl.html"
+                            target="_blank"
+                            rel="noopener"
+                            >https://www.gnu.org/licenses/agpl.html</a
+                        >.
+                    </div>
+                </div>
+            </section>
+            <hr class="section-hr gap-before" />
+            <ins
+                class="adsbygoogle sf-hidden ad-container"
+                data-ad-client="ca-pub-6947625383714468"
+                data-ad-slot="8392879036"
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+            ></ins>
+        </main>
+        <footer>
+            <div class="container text-center">
+                リンクはフリーですのでご自由にどうぞ。<br />
+                <br />
+                by
+                <a
+                    href="https://codeberg.org/TeamNeoUtl"
+                    target="_blank"
+                    rel="noopener"
+                    >Team NeoUtl</a
+                >
+            </div>
+            <hr class="section-hr" />
+            <div class="container header-bar">
+                <span class="text-small" id="neoutl-counter"
+                    >今日: <b>--</b> / 昨日: <b>--</b> / 累計: <b>--</b></span
+                >
+                <span class="text-small"
+                    ><a
+                        href="https://spring-fragrance.mints.ne.jp/aviutl/"
+                        target="_blank"
+                        rel="noopener"
+                        >AviUtlのお部屋はこちら</a
+                    ></span
+                >
+            </div>
+        </footer>
+
+        <!-- Madoka Launcher ポップアップ（元の data-table 構造に戻す） -->
+        <div
+            id="madoka-modal"
+            style="
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.64);
+                z-index: 9999;
+                align-items: center;
+                justify-content: center;
+            "
+        >
+            <div class="container" style="max-width: 500px; padding: 16px">
+                <table class="data-table">
+                    <tbody>
+                        <tr class="row-accent">
+                            <th>
+                                <span class="text-link"
+                                    ><b>Madoka Launcher のご案内</b></span
+                                >
+                            </th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px">
+                                <p
+                                    id="madoka-modal-text"
+                                    style="
+                                        font-size: small;
+                                        margin-top: 0;
+                                        margin-bottom: 12px;
+                                        line-height: 1.6;
+                                    "
+                                ></p>
+
+                                <div
+                                    class="info-box"
+                                    style="margin-bottom: 12px"
+                                >
+                                    <div class="info-box-inner">
+                                        <a
+                                            id="madoka-launcher-dl-btn"
+                                            href="https://github.com/TeamNeoUtl/Madoka-Launcher/releases"
+                                            target="_blank"
+                                            rel="noopener"
+                                            style="
+                                                display: block;
+                                                padding: 12px;
+                                                text-decoration: none;
+                                                font-weight: bold;
+                                                color: #1f5f1f;
+                                                text-align: center;
+                                            "
+                                        >
+                                            Madoka Launcher をダウンロード
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <a
+                                        id="madoka-direct-link"
+                                        href="#"
+                                        class="text-small"
+                                        >いいえ、<span id="madoka-soft-name"
+                                            >ソフトウェア</span
+                                        >を直接ダウンロードします（非推奨）</a
+                                    >
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <a
+                                    id="madoka-back-btn"
+                                    href="#"
+                                    class="float-right text-small"
+                                    >戻る</a
+                                >
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
 </html>

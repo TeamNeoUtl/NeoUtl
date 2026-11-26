@@ -319,7 +319,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const isLinux = ua.includes("linux") && !ua.includes("android");
     const isMac = ua.includes("mac");
 
-    let osName = "Windows / Linux";
+    let osName = "Windows / Linux / macOS";
     if (isWindows) {
       osName = "Windows";
     } else if (isLinux) {
@@ -364,10 +364,95 @@ document.addEventListener("DOMContentLoaded", () => {
             name.includes("linux")
           );
         });
+      } else if (isMac) {
+        let isIntel = false;
+        let isArm = false;
+        try {
+          if (
+            navigator.userAgentData &&
+            navigator.userAgentData.getHighEntropyValues
+          ) {
+            const hints = await navigator.userAgentData.getHighEntropyValues([
+              "architecture",
+            ]);
+            if (hints.architecture) {
+              if (hints.architecture.includes("arm")) isArm = true;
+              else if (hints.architecture.includes("x86")) isIntel = true;
+            }
+          }
+        } catch (_) {}
+        if (!isArm && !isIntel) {
+          try {
+            const canvas = document.createElement("canvas");
+            const gl =
+              canvas.getContext("webgl") ||
+              canvas.getContext("experimental-webgl");
+            if (gl) {
+              const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+              if (debugInfo) {
+                const renderer = gl.getParameter(
+                  debugInfo.UNMASKED_RENDERER_WEBGL,
+                );
+                if (/apple m|apple gpu/i.test(renderer)) {
+                  isArm = true;
+                } else if (/intel|amd|radeon/i.test(renderer)) {
+                  isIntel = true;
+                }
+              }
+            }
+          } catch (_) {}
+        }
+
+        const macAssets = assets.filter((asset) => {
+          const name = asset.name.toLowerCase();
+          return (
+            name.includes("macos") ||
+            name.includes("darwin") ||
+            name.includes("mac") ||
+            name.includes("apple") ||
+            name.endsWith(".dmg") ||
+            name.endsWith(".pkg")
+          );
+        });
+
+        if (isIntel) {
+          targetAsset =
+            macAssets.find((asset) => {
+              const name = asset.name.toLowerCase();
+              return (
+                name.includes("x86_64") ||
+                name.includes("x64") ||
+                name.includes("intel") ||
+                name.includes("amd64") ||
+                name.includes("universal")
+              );
+            }) || macAssets[0];
+        } else {
+          targetAsset =
+            macAssets.find((asset) => {
+              const name = asset.name.toLowerCase();
+              return (
+                name.includes("arm64") ||
+                name.includes("aarch64") ||
+                name.includes("arm") ||
+                name.includes("universal")
+              );
+            }) ||
+            macAssets.find((asset) => {
+              const name = asset.name.toLowerCase();
+              return (
+                name.includes("x86_64") ||
+                name.includes("x64") ||
+                name.includes("intel") ||
+                name.includes("amd64")
+              );
+            }) ||
+            macAssets[0];
+        }
       }
 
       if (launcherDlBtn) {
-        if (targetAsset && (isWindows || isLinux)) {
+        if (targetAsset) {
           launcherDlBtn.href = targetAsset.browser_download_url;
         } else {
           launcherDlBtn.href = data.html_url || LATEST_RELEASE_URL;
@@ -379,10 +464,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })();
 
-  // MacUtl 以外のテーブル（.dl-table）に含まれる .dl-item を対象にする
+  // 全てのテーブル（.dl-table）に含まれる .dl-item を対象にする
   document.querySelectorAll(".dl-table").forEach((table) => {
-    if (table.id === "download-table-macutl") return; // MacUtl は除外
-
     const thSpan = table.querySelector("tr.row-accent th span");
     const softName = thSpan ? thSpan.textContent.trim() : "ソフトウェア";
 
